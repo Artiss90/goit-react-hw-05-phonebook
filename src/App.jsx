@@ -6,6 +6,9 @@ import ContactList from './Components/ContactList/ContactList';
 import FilterName from './Components/FilterName/FilterName';
 import style from './App.module.css';
 import classNames from 'classnames/bind';
+import Logo from 'Components/Logo/Logo';
+import appearSlide from './transitionsCSS/appearSlide.module.css'; /**модули CSS указывать до CSSTransition */
+import { CSSTransition } from 'react-transition-group';
 
 /* eslint react/prop-types: 1 */
 
@@ -23,7 +26,7 @@ class App extends Component {
   };
 
   componentDidMount() {
-    console.log('App componentDidMount');
+    // console.log('App componentDidMount');
     // TODO: 'При загрузке приложения, контакты, если таковые есть, считываются из локального хранилища и записываются в состояние'
 
     const listContacts = localStorage.getItem('listContacts');
@@ -47,10 +50,6 @@ class App extends Component {
       // );
       localStorage.setItem('listContacts', JSON.stringify(nextContacts));
     }
-
-    // if (nextContacts.length > prevContacts.length && prevContacts.length !== 0) {
-    //   this.toggleModal();
-    // }
   }
 
   addContact = ({ name, number }) => {
@@ -96,10 +95,18 @@ class App extends Component {
   };
 
   render() {
-    console.log(style);
+    console.log(appearSlide);
     return (
       <>
-        <h2 className={mixStyle('title')}>Phonebook</h2>
+        <CSSTransition
+          in={true}
+          appear={true}
+          timeout={500}
+          classNames={appearSlide}
+          unmountOnExit
+        >
+          <Logo />
+        </CSSTransition>
         <Form onSubmitForm={this.addContact}></Form>
         <FilterName value={this.state.filter} onChange={this.changeFilter} />
         <h2 className={mixStyle('title', 'center')}>Contacts</h2>
