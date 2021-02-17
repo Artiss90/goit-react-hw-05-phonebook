@@ -7,7 +7,10 @@ import FilterName from './Components/FilterName/FilterName';
 import style from './App.module.css';
 import classNames from 'classnames/bind';
 import Logo from 'Components/Logo/Logo';
+import Alert from 'Components/Alert/Alert';
 import appearSlide from './transitionsCSS/appearSlide.module.css'; /**модули CSS указывать до CSSTransition */
+import fade from './transitionsCSS/fade.module.css';
+// import fadeScale from './transitionsCSS/fadeScale.module.css';
 import { CSSTransition } from 'react-transition-group';
 
 /* eslint react/prop-types: 1 */
@@ -23,10 +26,10 @@ class App extends Component {
       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
     filter: '',
+    alertRepetition: '',
   };
 
   componentDidMount() {
-    // console.log('App componentDidMount');
     // TODO: 'При загрузке приложения, контакты, если таковые есть, считываются из локального хранилища и записываются в состояние'
 
     const listContacts = localStorage.getItem('listContacts');
@@ -38,7 +41,6 @@ class App extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // console.log('App componentDidUpdate');
     // TODO: 'При добавлении и удалении контакта, контакты сохраняются в локальное хранилище'
 
     const nextContacts = this.state.contacts;
@@ -50,10 +52,13 @@ class App extends Component {
       // );
       localStorage.setItem('listContacts', JSON.stringify(nextContacts));
     }
+    //   if (nextAlert !== prevAlert)
+    //   {
+    //     this.onResetAlert()
+    //  }
   }
 
   addContact = ({ name, number }) => {
-    console.log({ name, number });
     const { contacts } = this.state;
     /**создаём новый контакт и присвоим ему ID  */
     const phoneContact = {
@@ -63,8 +68,7 @@ class App extends Component {
     };
     /**проверка на повторение имён */
     if (contacts.find(contactPhone => contactPhone.name === name)) {
-      console.log(`Повторяющееся имя ${name}`);
-      alert(`${name} is already in contacts!`);
+      this.setState({ alertRepetition: `${name} is already in contacts!` });
       return;
     }
     /**добавляем новый контакт в в состояние контактов */
@@ -93,12 +97,16 @@ class App extends Component {
       ),
     }));
   };
+  onResetAlert = () => {
+    this.setState({ alertRepetition: '' });
+  };
 
   render() {
-    console.log(appearSlide);
+    const { contacts, alertRepetition } = this.state;
     return (
       <>
         <CSSTransition
+          //TODO добавляем анимацию появления Logo при загрузке страницы
           in={true}
           appear={true}
           timeout={500}
@@ -107,8 +115,26 @@ class App extends Component {
         >
           <Logo />
         </CSSTransition>
+        <CSSTransition
+          //TODO Анимация появления-исчезания предупреждения о совпадении имён по условию
+          in={alertRepetition.length > 0}
+          timeout={3000}
+          classNames={fade}
+          unmountOnExit
+          onEntered={() => this.onResetAlert()}
+        >
+          <Alert message={alertRepetition} />
+        </CSSTransition>
         <Form onSubmitForm={this.addContact}></Form>
-        <FilterName value={this.state.filter} onChange={this.changeFilter} />
+        <CSSTransition
+          //TODO Анимация появления-исчезания поля для фильтра контактов по условию
+          in={contacts.length > 1}
+          timeout={500}
+          classNames={fade}
+          unmountOnExit
+        >
+          <FilterName value={this.state.filter} onChange={this.changeFilter} />
+        </CSSTransition>
         <h2 className={mixStyle('title', 'center')}>Contacts</h2>
         <ContactList
           contacts={this.getVisibleContacts()}

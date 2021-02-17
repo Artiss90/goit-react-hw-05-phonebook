@@ -47,7 +47,7 @@ export default class Form extends Component {
 
   handleChange = e => {
     const { name, value } = e.currentTarget;
-    console.log({ name, value });
+    // console.log({ name, value });
     this.setState({ [name]: value });
   };
 
